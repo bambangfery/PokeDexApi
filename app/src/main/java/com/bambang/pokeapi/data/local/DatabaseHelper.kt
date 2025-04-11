@@ -5,17 +5,20 @@ import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.bambang.pokeapi.domain.model.Pokemon
 import com.bambang.pokeapi.domain.model.User
 
 class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "user_db", null, 1) {
+    SQLiteOpenHelper(context, "user_db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, name TEXT, password TEXT)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS pokemon (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, imageUrl TEXT)")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS users")
+        db.execSQL("DROP TABLE IF EXISTS pokemon")
         onCreate(db)
     }
 
@@ -52,6 +55,42 @@ class DatabaseHelper(context: Context) :
         }
         cursor.close()
         return user
+    }
+
+    fun clearPokemons() {
+        val db = writableDatabase
+        db.delete("pokemon", null, null)
+    }
+
+    fun insertPokemonList(pokemonList: List<Pokemon>) {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete("pokemon", null, null)
+            for (pokemon in pokemonList) {
+                val values = ContentValues().apply {
+                    put("name", pokemon.name)
+                    put("imageUrl", pokemon.url)
+                }
+                db.insert("pokemon", null, values)
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun getAllPokemon(): List<Pokemon> {
+        val list = mutableListOf<Pokemon>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM pokemon", null)
+        while (cursor.moveToNext()) {
+            val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+            val imageUrl = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"))
+            list.add(Pokemon(name, imageUrl))
+        }
+        cursor.close()
+        return list
     }
 
 }

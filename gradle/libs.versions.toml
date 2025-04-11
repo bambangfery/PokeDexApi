@@ -1,8 +1,15 @@
 [versions]
+fragmentKtx = "1.6.2"
+glide = "4.16.0"
+hiltAndroidCompiler = "2.50"
+hiltCompiler = "1.0.0"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
+hiltNavigationFragment = "1.1.0"
 kotlin = "1.9.0"
 androidGradlePlugin = "8.2.2"
 hilt = "2.50"
 lifecycle = "2.7.0"
+lifecycleRuntimeKtx = "2.7.0"
 retrofit = "2.9.0"
 coroutines = "1.7.3"
 material = "1.11.0"
@@ -11,19 +18,25 @@ coreKtx = "1.12.0"
 junit = "4.13.2"
 espresso = "3.5.1"
 junitExt = "1.1.5"
-ktx = "1.8.2"
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlinKapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+daggerHilt = { id = "dagger.hilt.android.plugin" }
 
 [libraries]
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltNavigationFragment" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 activity-ktx = { module = "androidx.activity:activity-ktx", version = "ktx" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
