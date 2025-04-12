@@ -18,7 +18,7 @@ class LoginViewModel @Inject constructor(
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            val result = loginUserUseCase(username, password)
+            val result = loginUserUseCase.execute(username, password)
             loginResult.postValue(result)
         }
     }
