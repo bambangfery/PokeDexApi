@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -45,15 +46,34 @@ class HomeFragment : Fragment() {
                 val layoutManager = rv.layoutManager as LinearLayoutManager
                 val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
                 val totalItemCount = layoutManager.itemCount
-                if (lastVisibleItem + 2 >= totalItemCount) {
+                if (lastVisibleItem + 2 >= totalItemCount && binding.searchView.query.isEmpty()) {
                     viewModel.loadNextPage()
                 }
+            }
+        })
+
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.searchPokemon(query ?: "")
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.searchPokemon(newText ?: "")
+                return true
             }
         })
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.pokemonList.collectLatest { list ->
                 adapter.submitList(list.toList())
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch  {
+            viewModel.filteredPokemonList.collectLatest { list ->
+                adapter.submitList(list.map { it.copy() })
+                binding.tvEmptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
             }
         }
 

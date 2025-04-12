@@ -19,6 +19,9 @@ class HomeViewModel @Inject constructor(
     private val _pokemonList = MutableStateFlow<List<Pokemon>>(emptyList())
     val pokemonList: StateFlow<List<Pokemon>> = _pokemonList
 
+    private val _filteredPokemons = MutableStateFlow<List<Pokemon>>(emptyList())
+    val filteredPokemonList: StateFlow<List<Pokemon>> = _filteredPokemons
+
     private var currentPage = 0
     private val pageSize = 10
     private var isLoading = false
@@ -39,6 +42,15 @@ class HomeViewModel @Inject constructor(
                 }
             }
             isLoading = false
+        }
+    }
+
+    fun searchPokemon(query: String) {
+        val lowerQuery = query.lowercase()
+        _filteredPokemons.value = if (query.isBlank()) {
+            _pokemonList.value
+        } else {
+            _pokemonList.value.filter { it.name.contains(lowerQuery, ignoreCase = true) }
         }
     }
 }

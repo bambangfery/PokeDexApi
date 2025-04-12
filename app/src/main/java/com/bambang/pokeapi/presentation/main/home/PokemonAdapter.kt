@@ -16,7 +16,7 @@ class PokemonAdapter(
     inner class PokemonViewHolder(private val binding: ItemPokemonBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(pokemon: Pokemon) {
-            binding.tvPokemonName.text = pokemon.name.capitalize()
+            binding.tvPokemonName.text = pokemon.name.replaceFirstChar { it.uppercaseChar()}
             Glide.with(binding.imgPokemon.context).load(pokemon.url).into(binding.imgPokemon)
         }
     }
@@ -27,9 +27,10 @@ class PokemonAdapter(
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        holder.bind(item)
         holder.itemView.setOnClickListener {
-            onClick(getItem(position))
+            onClick(item)
         }
     }
 
@@ -39,7 +40,7 @@ class PokemonAdapter(
         }
 
         override fun areContentsTheSame(oldItem: Pokemon, newItem: Pokemon): Boolean {
-            return oldItem == newItem
+            return oldItem.name == newItem.name
         }
     }
 }
