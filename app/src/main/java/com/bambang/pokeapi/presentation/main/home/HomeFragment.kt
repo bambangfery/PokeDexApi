@@ -1,5 +1,6 @@
 package com.bambang.pokeapi.presentation.main.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bambang.pokeapi.databinding.FragmentHomeBinding
+import com.bambang.pokeapi.presentation.main.detail.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -30,7 +32,11 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = PokemonAdapter()
+        val adapter = PokemonAdapter { selectedPokemon ->
+            val intent = Intent(requireContext(), DetailActivity::class.java)
+            intent.putExtra("name", selectedPokemon.name)
+            startActivity(intent)
+        }
         binding.rvPokemon.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPokemon.adapter = adapter
 

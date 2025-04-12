@@ -9,7 +9,9 @@ import com.bambang.pokeapi.databinding.ItemPokemonBinding
 import com.bambang.pokeapi.domain.model.Pokemon
 import com.bumptech.glide.Glide
 
-class PokemonAdapter : ListAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(DiffCallback()) {
+class PokemonAdapter(
+    private val onClick: (Pokemon) -> Unit
+) : ListAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(DiffCallback()) {
 
     inner class PokemonViewHolder(private val binding: ItemPokemonBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -26,6 +28,9 @@ class PokemonAdapter : ListAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(Di
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
         holder.bind(getItem(position))
+        holder.itemView.setOnClickListener {
+            onClick(getItem(position))
+        }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Pokemon>() {

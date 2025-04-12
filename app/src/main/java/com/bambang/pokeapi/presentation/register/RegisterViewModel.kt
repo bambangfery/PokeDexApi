@@ -19,7 +19,7 @@ class RegisterViewModel @Inject constructor(
     fun register(username: String, name: String, password: String) {
         viewModelScope.launch {
             val user = User(username = username, name = name, password = password)
-            val result = registerUserUseCase(user)
+            val result = registerUserUseCase.execute(user)
             registerResult.postValue(result)
         }
     }

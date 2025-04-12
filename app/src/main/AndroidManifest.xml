@@ -29,6 +29,8 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <activity android:name=".presentation.main.MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
+        <activity android:name=".presentation.main.detail.DetailActivity"
+            android:theme="@style/Theme.AppCompat"/>
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@ package com.bambang.pokeapi.data.repository
 import com.bambang.pokeapi.data.local.DatabaseHelper
 import com.bambang.pokeapi.data.mapper.toPokemon
 import com.bambang.pokeapi.data.remote.api.PokeApiService
+import com.bambang.pokeapi.data.remote.dto.PokemonDetailResponse
 import com.bambang.pokeapi.domain.model.Pokemon
 import com.bambang.pokeapi.domain.repository.PokemonRepository
 import javax.inject.Inject
@@ -37,5 +38,30 @@ class PokemonRepositoryImpl @Inject constructor(
 
     override suspend fun getLocalPokemonCount(): Int {
         return db.getPokemonCount()
+    }
+
+    override suspend fun getPokemonDetail(name: String): Result<PokemonDetailResponse> {
+        return try {
+            val response = api.getPokemonDetail(name)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    db.insertPokemonDetail(it)
+                    Result.success(it)
+                } ?: Result.failure(Exception("Empty Body"))
+            } else {
+                getLocalPokemonDetailOrError(name, "API error ${response.code()}")
+            }
+        } catch (e: Exception) {
+            getLocalPokemonDetailOrError(name, e.message ?: "Unknown error")
+        }
+    }
+
+    private fun getLocalPokemonDetailOrError(name: String, errorMessage: String): Result<PokemonDetailResponse> {
+        val local = db.getPokemonDetail(name)
+        return if (local != null) {
+            Result.success(local)
+        } else {
+            Result.failure(Exception("Failed from API and no local cache: $errorMessage"))
+        }
     }
 }
