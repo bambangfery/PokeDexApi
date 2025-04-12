@@ -57,16 +57,11 @@ class DatabaseHelper(context: Context) :
         return user
     }
 
-    fun clearPokemons() {
-        val db = writableDatabase
-        db.delete("pokemon", null, null)
-    }
 
     fun insertPokemonList(pokemonList: List<Pokemon>) {
         val db = writableDatabase
         db.beginTransaction()
         try {
-            db.delete("pokemon", null, null)
             for (pokemon in pokemonList) {
                 val values = ContentValues().apply {
                     put("name", pokemon.name)
@@ -80,17 +75,29 @@ class DatabaseHelper(context: Context) :
         }
     }
 
-    fun getAllPokemon(): List<Pokemon> {
-        val list = mutableListOf<Pokemon>()
+    fun getPokemonList(limit: Int, offset: Int): List<Pokemon> {
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM pokemon", null)
+        val cursor = db.rawQuery("SELECT name, imageUrl FROM pokemon LIMIT ? OFFSET ?", arrayOf(limit.toString(), offset.toString()))
+        val list = mutableListOf<Pokemon>()
         while (cursor.moveToNext()) {
-            val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
-            val imageUrl = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"))
-            list.add(Pokemon(name, imageUrl))
+            list.add(
+                Pokemon(
+                    cursor.getString(0),
+                    cursor.getString(1)
+                )
+            )
         }
         cursor.close()
         return list
+    }
+
+    fun getPokemonCount(): Int {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM pokemon", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
     }
 
 }

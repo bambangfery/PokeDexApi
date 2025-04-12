@@ -2,26 +2,20 @@ package com.bambang.pokeapi.presentation.main.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bambang.pokeapi.databinding.ItemPokemonBinding
 import com.bambang.pokeapi.domain.model.Pokemon
 import com.bumptech.glide.Glide
 
-class PokemonAdapter : RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder>() {
-
-    private val list = mutableListOf<Pokemon>()
-
-    fun submitList(newList: List<Pokemon>) {
-        list.clear()
-        list.addAll(newList)
-        notifyDataSetChanged()
-    }
+class PokemonAdapter : ListAdapter<Pokemon, PokemonAdapter.PokemonViewHolder>(DiffCallback()) {
 
     inner class PokemonViewHolder(private val binding: ItemPokemonBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(pokemon: Pokemon) {
-            binding.tvPokemonName.text = pokemon.name
-            Glide.with(binding.root).load(pokemon.url).into(binding.imgPokemon)
+            binding.tvPokemonName.text = pokemon.name.capitalize()
+            Glide.with(binding.imgPokemon.context).load(pokemon.url).into(binding.imgPokemon)
         }
     }
 
@@ -31,8 +25,16 @@ class PokemonAdapter : RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder>() 
     }
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = list.size
+    class DiffCallback : DiffUtil.ItemCallback<Pokemon>() {
+        override fun areItemsTheSame(oldItem: Pokemon, newItem: Pokemon): Boolean {
+            return oldItem.name == newItem.name
+        }
+
+        override fun areContentsTheSame(oldItem: Pokemon, newItem: Pokemon): Boolean {
+            return oldItem == newItem
+        }
+    }
 }

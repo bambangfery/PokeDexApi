@@ -6,9 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bambang.pokeapi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -30,11 +34,24 @@ class HomeFragment : Fragment() {
         binding.rvPokemon.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPokemon.adapter = adapter
 
-        viewModel.pokemonList.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        binding.rvPokemon.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = rv.layoutManager as LinearLayoutManager
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+                if (lastVisibleItem + 2 >= totalItemCount) {
+                    viewModel.loadNextPage()
+                }
+            }
+        })
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.pokemonList.collectLatest { list ->
+                adapter.submitList(list.toList())
+            }
         }
 
-        viewModel.loadPokemon()
+        viewModel.loadNextPage()
     }
 
     override fun onDestroyView() {

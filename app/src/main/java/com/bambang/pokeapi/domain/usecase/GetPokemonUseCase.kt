@@ -7,6 +7,15 @@ import javax.inject.Inject
 class GetPokemonUseCase @Inject constructor(
     private val repository: PokemonRepository
 ) {
-    suspend fun fetchAndSave(): List<Pokemon> = repository.fetchPokemon()
-    fun getLocal(): List<Pokemon> = repository.getLocalPokemon()
+    suspend fun execute(page: Int, pageSize: Int): Result<List<Pokemon>> {
+        val offset = page * pageSize
+        val currentCount = repository.getLocalPokemonCount()
+
+        if (offset >= currentCount) {
+            repository.fetchPokemonPage(pageSize, offset)
+        }
+
+        val list = repository.getLocalPokemonPage(pageSize, offset)
+        return Result.success(list)
+    }
 }
